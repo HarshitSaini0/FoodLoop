@@ -1,0 +1,13 @@
+[Unit]
+Description=FoodLoop prototype
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/foodloop
+EnvironmentFile=/home/ubuntu/foodloop/.env
+ExecStart=/home/ubuntu/foodloop/.venv/bin/uvicorn foodloop.app:app --host 127.0.0.1 --port 8001
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

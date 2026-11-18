@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block content %}
+<div class="card">
+<h2>Scan a batch</h2>
+<p>Upload a photo. The model proposes a label and a route, and a person must confirm it.</p>
+<form action="/scan" method="post" enctype="multipart/form-data">
+<label for="photo">Photo (JPEG or PNG, up to 5 MB)</label>
+<input id="photo" type="file" name="photo" accept="image/*" required>
+<label for="category">Food category</label>
+<select id="category" name="category">{% for c in categories %}<option value="{{ c }}">{{ c.replace("_"," ") }}</option>{% endfor %}</select>
+<label for="source">Source (farm, store or site name)</label>
+<input id="source" name="source" maxlength="80" placeholder="e.g. Demo Farm">
+<button type="submit">Scan</button>
+</form></div>
+{% endblock %}

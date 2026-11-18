@@ -1,0 +1,39 @@
+{% extends "base.html" %}{% block content %}
+{% if error %}<div class="err">{{ error }}</div>{% endif %}
+<div class="card">
+<h2>Batch {{ batch_id }}</h2>
+<img class="photo" src="/image/{{ batch_id }}" alt="Uploaded food photo" width="420">
+<p><b>Model label:</b> {{ p.label }} ({{ "%.0f"|format(p.confidence*100) }}% confidence) <span class="pill">{{ p.classifier }}</span><br>
+<b>Category:</b> {{ p.category.replace("_"," ") }}{% if p.higher_risk %} (higher risk){% endif %}<br>
+<b>Suggested route:</b> {{ route_labels[p.proposed_route] }}<br>
+<span style="color:var(--mute)">{{ p.reason }}</span></p>
+</div>
+
+<div class="card"><h3>1. Human review</h3>
+{% if s.reviewed %}
+<p class="ok">{{ s.reviewer }} chose: {{ route_labels[s.final_route] }}{% if s.overridden %} (overrode the suggestion){% endif %}</p>
+{% else %}
+<form action="/batch/{{ batch_id }}/review" method="post">
+<label for="reviewer">Reviewer name</label><input id="reviewer" name="reviewer" required>
+<label for="final_route">Final route</label>
+<select id="final_route" name="final_route">{% for r in routes %}<option value="{{ r }}" {% if r == p.proposed_route %}selected{% endif %}>{{ route_labels[r] }}</option>{% endfor %}</select>
+<button type="submit">Confirm or override</button></form>
+{% endif %}</div>
+
+<div class="card"><h3>2. Handover and credit</h3>
+{% if not s.reviewed %}<p>Waiting for review.</p>
+{% elif s.final_route == "hold" %}<p>Held. No handover or credit until a person decides on a different route.</p>
+{% else %}
+<p>Donor: {{ s.donor or "not confirmed" }}<br>Recipient: {{ s.recipient or "not confirmed" }}</p>
+{% if not s.donor %}
+<form action="/batch/{{ batch_id }}/confirm/donor" method="post"><label for="dn">Donor name</label><input id="dn" name="name" required><button>Donor confirms handover</button></form>
+{% elif not s.recipient %}
+<form action="/batch/{{ batch_id }}/confirm/recipient" method="post"><label for="rn">Recipient name</label><input id="rn" name="name" required><button>Recipient confirms receipt</button></form>
+{% endif %}
+{% if s.credit %}<p class="ok">Credit issued to {{ s.donor }} (demo credit, no monetary value).</p>{% endif %}
+{% endif %}</div>
+
+<div class="card"><h3>Audit trail</h3>
+<table><tr><th>Time (UTC)</th><th>Event</th><th>Hash</th></tr>
+{% for e in events %}<tr><td>{{ e.ts }}</td><td>{{ e.event }}</td><td><code>{{ e.hash[:16] }}</code></td></tr>{% endfor %}</table></div>
+{% endblock %}

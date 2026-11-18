@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block content %}
+<div class="card"><h2>Ledger</h2>
+<p class="{{ 'ok' if ok else 'bad' }}">{{ msg }}</p>
+<p style="color:var(--mute)">Each row stores the hash of the row before it. Changing an old row breaks the chain.</p>
+<table><tr><th>#</th><th>Time (UTC)</th><th>Batch</th><th>Event</th><th>Hash</th></tr>
+{% for e in entries %}<tr><td>{{ e.id }}</td><td>{{ e.ts }}</td><td><a href="/batch/{{ e.batch_id }}">{{ e.batch_id }}</a></td><td>{{ e.event }}</td><td><code>{{ e.hash[:16] }}</code></td></tr>{% endfor %}
+</table></div>
+{% endblock %}

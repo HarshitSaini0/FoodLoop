@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block content %}
+<div class="card"><h2>Batches</h2>
+{% if not rows %}<p>No batches yet. <a href="/">Scan one.</a></p>{% else %}
+<table><tr><th>Batch</th><th>Label</th><th>Route</th><th>Status</th></tr>
+{% for r in rows %}<tr>
+<td><a href="/batch/{{ r.id }}">{{ r.id }}</a><br><small>{{ r.ts }}</small></td>
+<td>{{ r.p.label }} ({{ "%.0f"|format(r.p.confidence*100) }}%)</td>
+<td>{{ route_labels[r.s.final_route or r.p.proposed_route] }}</td>
+<td>{% if r.s.credit %}<span class="ok">credit issued</span>{% elif r.s.reviewed %}reviewed{% else %}needs review{% endif %}</td></tr>{% endfor %}
+</table>{% endif %}</div>
+{% endblock %}
